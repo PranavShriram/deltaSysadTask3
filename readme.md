@@ -2,7 +2,7 @@
 
 A chat room using python socket programming for delta inductions
 
-## User manual##
+## User manual
 
 1. Ensure python of version more than 3.6 is installed in your computer.
 2. Open the terminal inside your cloned folder and run ```python server.py```
