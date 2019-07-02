@@ -6,6 +6,7 @@ HEAD_LEN = 10
 IP = "127.0.0.1"
 PORT = 3000
 
+history = []
 
 ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -77,6 +78,17 @@ while True:
             user = clients[notified_socket]
 
             print(f'Received message from {user["data"].decode("utf-8")}: {message["data"].decode("utf-8")}')
+            
+            if message["data"].decode("utf-8") == "chat_history":
+                with open(user["data"].decode("utf-8")+".txt", "w") as file:
+                    for line in history:     
+                        file.write(line)
+                        file.write("\n")
+            else:
+                history.append(f'Received message from {user["data"].decode("utf-8")}: {message["data"].decode("utf-8")}')
+            
+
+            
 
             for client_socket in clients:
 
