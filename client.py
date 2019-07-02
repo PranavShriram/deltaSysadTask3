@@ -1,12 +1,45 @@
 import socket
 import select
 import errno
+import pymongo
+import hashlib
+import base64
+import uuid
+from passlib.hash import sha256_crypt
+
+
+
+from pymongo import MongoClient
+
+client = MongoClient('mongodb://localhost:27017/')
+
+db = client.chatroom
+collection = db.user
 
 HEAD_LEN = 10
 
 IP = "127.0.0.1"
-PORT = 1234
-my_username = input("Username: ")
+PORT = 3000
+
+history = []
+
+
+while(True):
+    my_username = input("Username: ")
+    my_password = input("Password: ")
+    userObj = {
+    "username":my_username
+    }
+    foundUser = collection.find_one(userObj)
+    if foundUser:
+        if sha256_crypt.verify(my_password, foundUser["password"]):
+            print("Welcome")
+            break
+        else:
+            print("Incorrect username or password")    
+
+
+
 
 
 cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,16 +72,14 @@ while True:
                 sys.exit()
             username_length = int(user_head.decode('utf-8').strip())
 
-            # Receive and decode username
             username = cs.recv(username_length).decode('utf-8')
 
-            # Now do the same for message (as we received username, we received whole message, there's no need to check if it has any length)
             message_header = cs.recv(HEAD_LEN)
             message_length = int(message_header.decode('utf-8').strip())
             message = cs.recv(message_length).decode('utf-8')
-
+            
             print(f'{username} > {message}')
-
+            
     except IOError as e:
    
         if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
